@@ -11,7 +11,7 @@ export default function App() {
           const url = URL.createObjectURL(blob);
           const audio = document.createElement("audio");
           const divider = document.createElement("div");
-          divider.className = "divider"
+          divider.className = "divider";
           audio.src = url;
           audio.controls = true;
           const recorder = document.getElementById("recorder");
