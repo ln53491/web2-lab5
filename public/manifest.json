@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Web2-Lab5",
+  "name": "Audio Recorder PWA",
   "icons": [
     {
       "src": "favicon.ico",
