@@ -4,25 +4,50 @@ import InstallIcon from './InstallIcon'
 import { AudioRecorder } from 'react-audio-voice-recorder';
 import { useAddToHomescreenPrompt } from "./AddToHomeScreen";
 import Background from "./Background";
+import axios from "axios";
+import addNotification from 'react-push-notification';
 
 export default function App() {
     const [prompt, promptToInstall] = useAddToHomescreenPrompt();
-      const addAudioElement = (blob) => {
-          const url = URL.createObjectURL(blob);
-          const audio = document.createElement("audio");
-          const divider = document.createElement("div");
-          divider.className = "divider";
-          audio.src = url;
-          audio.controls = true;
-          const recorder = document.getElementById("recorder");
-          while (recorder.childNodes.length > 1) {
-              recorder.removeChild(recorder.lastChild);
-          }
-          recorder.appendChild(divider)
-          recorder.appendChild(audio);
-      };
 
-      return (
+    const setData = (blob) => {
+        const data = {
+            size: blob.size
+        }
+        axios.post('https://jsonplaceholder.typicode.com/posts', data)
+            .then(r => sendNotification(r.data))
+            .catch(() => {
+                navigator.serviceWorker.ready(serviceWorkerRegistration => {
+                    serviceWorkerRegistration.sync.register('sync-data');
+                });
+            });
+    }
+
+    const sendNotification = (data) => {
+        addNotification({
+            title: 'Audio successfully saved!',
+            message: `Id: ${data.id}\nSize: ${data.size}B`,
+            native: true
+        });
+    };
+
+    const addAudioElement = (blob) => {
+        const url = URL.createObjectURL(blob);
+        const audio = document.createElement("audio");
+        const divider = document.createElement("div");
+        divider.className = "divider";
+        audio.src = url;
+        audio.controls = true;
+        const recorder = document.getElementById("recorder");
+        while (recorder.childNodes.length > 1) {
+            recorder.removeChild(recorder.lastChild);
+        }
+        recorder.appendChild(divider)
+        recorder.appendChild(audio);
+        setData(blob);
+    };
+
+    return (
           <div className="center-div">
               <Background/>
               <div className="container-div">
@@ -53,6 +78,9 @@ export default function App() {
                           INSTALL THIS APP TO HOME SCREEN
                       </div>
                   </div>
+              </div>
+              <div className="credits">
+                  created by Luka Nestić for the purpose of WEB2 laboratory project as a demonstration of Progressive Web Applications
               </div>
           </div>
       );
