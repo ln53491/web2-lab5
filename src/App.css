@@ -103,6 +103,50 @@ body {
   animation: opacityanimation 1s ease-in-out;
 }
 
+@media only screen and (max-width: 800px) {
+  .title {
+    font-size: 24px;
+    padding: 15px 20px;
+    margin-left: 20px;
+    margin-right: 20px;
+    text-align: center;
+  }
+  .title-2 {
+    font-size: 20px;
+    padding: 10px 15px;
+    margin-left: 20px;
+    margin-right: 20px;
+    text-align: center;
+  }
+  .desc {
+    font-size: 18px;
+    text-align: center;
+  }
+  .credits {
+    font-size: 18px;
+    text-align: center;
+  }
+  body {
+    box-shadow: none;
+    animation: AnimationName 30s ease infinite;
+    width: 105vw;
+  }
+  .padding {
+    padding-left: 10px;
+  }
+  .icon {
+    width: 30px;
+  }
+  .recorder {
+    display: flex;
+    height: 125px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+
 @-webkit-keyframes AnimationName {
   0%{background-position:50% 58%}
   50%{background-position:100% 63%}

@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import "./App.css"
 import InstallIcon from './InstallIcon'
 import { AudioRecorder } from 'react-audio-voice-recorder';
@@ -9,13 +9,32 @@ import addNotification from 'react-push-notification';
 
 export default function App() {
     const [prompt, promptToInstall] = useAddToHomescreenPrompt();
+    const [allowed, setAllowed] = useState(true);
+    const [width, setWidth] = React.useState(window.innerWidth);
+    const breakpoint = 800;
+
+    useEffect(() => {
+        const handleResizeWindow = () => setWidth(window.innerWidth);
+        window.addEventListener("resize", handleResizeWindow);
+        return () => {
+            window.removeEventListener("resize", handleResizeWindow);
+        };
+    }, []);
+
+    useEffect(() => {
+        try {
+            navigator.mediaDevices.getUserMedia({audio: true}).then();
+        } catch (error) {
+            setAllowed(false);
+        }
+    }, []);
 
     const setData = (blob) => {
         const data = {
             size: blob.size
         }
         axios.post('https://jsonplaceholder.typicode.com/posts', data)
-            .then(r => sendNotification(r.data))
+            .then(r => sendPushSaved(r.data))
             .catch(() => {
                 navigator.serviceWorker.ready(serviceWorkerRegistration => {
                     serviceWorkerRegistration.sync.register('sync-data');
@@ -23,7 +42,7 @@ export default function App() {
             });
     }
 
-    const sendNotification = (data) => {
+    const sendPushSaved = (data) => {
         addNotification({
             title: 'Audio successfully saved!',
             message: `Id: ${data.id}\nSize: ${data.size}B`,
@@ -58,25 +77,35 @@ export default function App() {
                       TAP TO RECORD AUDIO
                   </div>
                   <div className="recorder" id="recorder">
-                      <AudioRecorder
-                          onRecordingComplete={addAudioElement}
-                          audioTrackConstraints={{
-                              noiseSuppression: true,
-                              echoCancellation: true,
-                          }}
-                          downloadOnSavePress={true}
-                          downloadFileExtension="webm"
-                          showVisualizer={true}
-                      />
+                      {allowed ?
+                          <AudioRecorder
+                              onRecordingComplete={addAudioElement}
+                              audioTrackConstraints={{
+                                  noiseSuppression: true,
+                                  echoCancellation: true,
+                              }}
+                              downloadOnSavePress={true}
+                              downloadFileExtension="webm"
+                              showVisualizer={true}
+                          /> :
+                          <div className="desc">
+                              Recording isn't supported on your device.
+                          </div>
+                      }
                   </div>
                   <div className="desc">
                       Using <b>Web Audio API</b> and <b>MediaRecorder</b>
                   </div>
                   <div className="title-2" onClick={promptToInstall}>
                       <InstallIcon className="icon"/>
-                      <div className="padding">
-                          INSTALL THIS APP TO HOME SCREEN
-                      </div>
+                      {width > breakpoint ?
+                          <div className="padding">
+                              INSTALL THIS APP TO HOME SCREEN
+                          </div> :
+                          <div className="padding">
+                              INSTALL TO HOME SCREEN
+                          </div>
+                      }
                   </div>
               </div>
               <div className="credits">
